@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mateus Hideki | Crystallize Snowflake</title>
+    <meta name="description" content="Recriação interativa do Crystallize (prism-on.tokyo) — Portfólio de Mateus Hideki Dri Hojo. Gire, congele, quebre e capture o cristal 3D.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ======== 3D WEBGL FULLSCREEN CANVAS ======== -->
+    <canvas id="webgl-canvas"></canvas>
+
+    <!-- ======== CAMERA SHUTTER & SHOCKWAVE FLASH ======== -->
+    <div id="shutter-flash" aria-hidden="true"></div>
+    <div id="shockwave-ring" aria-hidden="true"></div>
+
+    <!-- ======== TOKYO MINIMALIST BACKGROUND ENVIRONMENT (INTEGRADO AO CENÁRIO) ======== -->
+    <div class="crystallize-bg-layer" aria-hidden="true">
+        <div class="bg-main-name">MATEUS HIDEKI</div>
+        <div class="bg-tagline">"Transformando ideias em projetos."</div>
+
+        <!-- Frases e Coordenadas Espalhadas com Efeito de Profundidade -->
+        <div class="bg-ambient-phrase p-top-left">
+            <span class="p-index">01</span>
+            <span class="p-text">Gosto de treinar.</span>
+            <span class="p-meta">DISCIPLINE // FOCUS</span>
+        </div>
+
+        <div class="bg-ambient-phrase p-bottom-left">
+            <span class="p-index">02</span>
+            <span class="p-text">Aprendo rápido.</span>
+            <span class="p-meta">AGILITY // CURIOSITY</span>
+        </div>
+
+        <div class="bg-ambient-phrase p-top-right">
+            <span class="p-index">03</span>
+            <span class="p-text">Gosto de ler.</span>
+            <span class="p-meta">KNOWLEDGE // SYSTEM</span>
+        </div>
+
+        <div class="bg-ambient-phrase p-bottom-right">
+            <span class="p-index">04</span>
+            <span class="p-text">Sempre buscando evoluir.</span>
+            <span class="p-meta">CONTINUOUS GROWTH</span>
+        </div>
+
+        <div class="bg-crosshair ch-1">+</div>
+        <div class="bg-crosshair ch-2">+</div>
+        <div class="bg-crosshair ch-3">+</div>
+        <div class="bg-crosshair ch-4">+</div>
+    </div>
+
+    <!-- ======== HUD TOP (MINIMALIST CRYSTALLIZE HEADER) ======== -->
+    <header class="hud-top">
+        <div class="hud-brand">
+            <span class="brand-title">MATEUS HIDEKI DRI HOJO</span>
+            <span class="brand-divider">/</span>
+            <span class="brand-age">17 ANOS</span>
+            <span class="brand-divider">/</span>
+            <span class="brand-role">ESTUDANTE & DEVELOPER</span>
+        </div>
+
+        <div class="hud-actions">
+            <div class="state-pill" id="statePill">
+                <span class="state-dot"></span>
+                <span class="state-text" id="stateText">ROTATING</span>
+            </div>
+            <button class="hud-btn" id="btnOpenProjects" aria-label="Abrir Projetos">
+                <span>PROJECTS</span>
+            </button>
+            <button class="hud-btn" id="btnOpenContact" aria-label="Abrir Contato">
+                <span>CONTACT</span>
+            </button>
+            <button class="hud-btn" id="btnAudioToggle" aria-label="Alternar som">
+                <i data-lucide="volume-2" id="audioIcon"></i>
+                <span id="audioText">SOUND</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ======== HUD BOTTOM (CONTROLES INTERATIVOS ORIGINAIS DO CRYSTALLIZE) ======== -->
+    <footer class="hud-bottom">
+        <div class="controls-hint">
+            <div class="key-combo">
+                <span class="key-badge">←</span>
+                <span class="key-badge">↑</span>
+                <span class="key-badge">↓</span>
+                <span class="key-badge">→</span>
+            </div>
+            <span class="hint-text">GIRAR / ROTATE</span>
+        </div>
+
+        <div class="crystal-control-bar">
+            <!-- Botão Congelar / Descongelar -->
+            <button class="crystal-btn btn-freeze" id="btnFreeze" title="Pressione Espaço para congelar">
+                <div class="btn-icon-wrap"><i data-lucide="snowflake"></i></div>
+                <div class="btn-label-wrap">
+                    <span class="btn-name" id="btnFreezeName">FREEZE</span>
+                    <kbd class="btn-kbd">SPACE</kbd>
+                </div>
+            </button>
+
+            <!-- Botão Quebrar / Shatter -->
+            <button class="crystal-btn btn-shatter" id="btnShatter" title="Pressione Enter para quebrar">
+                <div class="btn-icon-wrap"><i data-lucide="zap"></i></div>
+                <div class="btn-label-wrap">
+                    <span class="btn-name">SHATTER</span>
+                    <kbd class="btn-kbd">ENTER</kbd>
+                </div>
+            </button>
+
+            <!-- Botão Fotografar / Capture -->
+            <button class="crystal-btn btn-capture" id="btnCapture" title="Pressione C para fotografar a criação">
+                <div class="btn-icon-wrap"><i data-lucide="camera"></i></div>
+                <div class="btn-label-wrap">
+                    <span class="btn-name">CAPTURE</span>
+                    <kbd class="btn-kbd">C</kbd>
+                </div>
+            </button>
+
+            <!-- Botão Novo Cristal / Restart -->
+            <button class="crystal-btn btn-restart" id="btnRestart" title="Pressione R para criar um novo cristal">
+                <div class="btn-icon-wrap"><i data-lucide="refresh-cw"></i></div>
+                <div class="btn-label-wrap">
+                    <span class="btn-name">NEW</span>
+                    <kbd class="btn-kbd">R</kbd>
+                </div>
+            </button>
+        </div>
+
+        <div class="telemetry-info">
+            <span class="tel-row">SHARDS: <strong id="shardCountDisplay">0</strong></span>
+            <span class="tel-row">SEED: <strong id="crystalSeedDisplay">#087A</strong></span>
+        </div>
+    </footer>
+
+    <!-- ======== DRAWER DE PROJETOS (MINIMALISTA E NÃO-INVASIVO) ======== -->
+    <div class="flyout-drawer" id="projectsDrawer" aria-hidden="true">
+        <div class="drawer-backdrop" id="projectsBackdrop"></div>
+        <div class="drawer-panel">
+            <div class="drawer-header">
+                <div class="drawer-title-wrap">
+                    <span class="drawer-kicker">PORTFOLIO // WORKS</span>
+                    <h2 class="drawer-title">PROJETOS</h2>
+                </div>
+                <button class="drawer-close-btn" id="btnCloseProjects" aria-label="Fechar">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <div class="drawer-content">
+                <!-- Projeto 01 -->
+                <div class="project-entry">
+                    <div class="project-entry-top">
+                        <span class="entry-index">01</span>
+                        <h3 class="entry-title">LOGIN LEGO</h3>
+                    </div>
+                    <p class="entry-desc">
+                        Projeto de uma tela de login inspirada no universo LEGO, desenvolvida com foco em criatividade, design e interação.
+                    </p>
+                    <a href="https://mateushojoo.github.io/Login.lego/" target="_blank" rel="noopener noreferrer" class="entry-btn">
+                        <span>VISUALIZAR PROJETO</span>
+                        <i data-lucide="external-link"></i>
+                    </a>
+                </div>
+
+                <!-- Projeto 02 -->
+                <div class="project-entry">
+                    <div class="project-entry-top">
+                        <span class="entry-index">02</span>
+                        <h3 class="entry-title">JOGO</h3>
+                    </div>
+                    <p class="entry-desc">
+                        Projeto de um jogo desenvolvido para demonstrar conhecimentos de programação e desenvolvimento web.
+                    </p>
+                    <a href="https://mateushojoo.github.io/Jogo/" target="_blank" rel="noopener noreferrer" class="entry-btn">
+                        <span>VISUALIZAR PROJETO</span>
+                        <i data-lucide="external-link"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======== DRAWER DE CONTATO (MINIMALISTA E ELEGANTE) ======== -->
+    <div class="flyout-drawer" id="contactDrawer" aria-hidden="true">
+        <div class="drawer-backdrop" id="contactBackdrop"></div>
+        <div class="drawer-panel">
+            <div class="drawer-header">
+                <div class="drawer-title-wrap">
+                    <span class="drawer-kicker">COMMUNICATION // REACH</span>
+                    <h2 class="drawer-title">CONTATO</h2>
+                </div>
+                <button class="drawer-close-btn" id="btnCloseContact" aria-label="Fechar">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <div class="drawer-content">
+                <div class="contact-entry">
+                    <div class="contact-entry-icon"><i data-lucide="message-circle"></i></div>
+                    <div class="contact-entry-info">
+                        <span class="c-type">WHATSAPP</span>
+                        <a href="https://wa.me/5519982237235" target="_blank" rel="noopener noreferrer" class="c-val">
+                            19 98223-7235
+                        </a>
+                    </div>
+                </div>
+
+                <div class="contact-entry">
+                    <div class="contact-entry-icon"><i data-lucide="linkedin"></i></div>
+                    <div class="contact-entry-info">
+                        <span class="c-type">LINKEDIN</span>
+                        <a href="https://linkedin.com/in/" target="_blank" rel="noopener noreferrer" class="c-val">
+                            Mateus Hojo
+                        </a>
+                    </div>
+                </div>
+
+                <div class="contact-entry">
+                    <div class="contact-entry-icon"><i data-lucide="mail"></i></div>
+                    <div class="contact-entry-info">
+                        <span class="c-type">E-MAIL</span>
+                        <a href="mailto:mtshojito@gmail.com" class="c-val">
+                            mtshojito@gmail.com
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======== NOTIFICAÇÃO TOAST DISCRETA (FOTOGRAFIA / COPIADO) ======== -->
+    <div id="toastNotification" class="toast-notification">CRISTAL FOTOGRAFADO</div>
+
+    <!-- ======== SCRIPTS ======== -->
+    <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/lucide@0.294.0/dist/umd/lucide.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

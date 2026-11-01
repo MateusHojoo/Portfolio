@@ -1,0 +1,760 @@
+/* ==========================================================================
+   PORTFÓLIO MATEUS HIDEKI — RECRIAÇÃO DO CRYSTALLIZE (prism-on.tokyo)
+   Identidade: Minimalista, Tokyo WebGL, Ice/Frost 3D
+   Cores: #0A192F, #123B65, #A5E8FF, #FFFFFF, #EAF8FF, #38BDF8
+   ========================================================================== */
+
+:root {
+    --bg-navy: #0A192F;
+    --bg-deep: #061122;
+    --ice-secondary: #123B65;
+    --ice-cyan: #A5E8FF;
+    --white: #FFFFFF;
+    --ice-light: #EAF8FF;
+    --ice-glow: #38BDF8;
+
+    /* Glassmorphism & Bordas */
+    --hud-glass: rgba(10, 25, 47, 0.65);
+    --hud-border: rgba(165, 232, 255, 0.22);
+    --hud-border-hover: rgba(56, 189, 248, 0.7);
+    --frost-shadow: 0 0 25px rgba(56, 189, 248, 0.35);
+
+    /* Tipografia */
+    --font-heading: 'Syne', sans-serif;
+    --font-mono: 'Space Grotesk', monospace, sans-serif;
+    --font-serif: 'Cinzel', serif;
+}
+
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--bg-navy);
+    background: radial-gradient(circle at 50% 50%, #112d52 0%, #0A192F 55%, var(--bg-deep) 100%);
+    color: var(--ice-light);
+    font-family: var(--font-mono);
+    position: relative;
+}
+
+/* --- CANVAS THREE.JS FULLSCREEN --- */
+#webgl-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    outline: none;
+    cursor: grab;
+}
+
+#webgl-canvas:active {
+    cursor: grabbing;
+}
+
+/* --- FLASH DO OBTURADOR (CAPTURE) & ONDA DE CHOQUE (SHATTER) --- */
+#shutter-flash {
+    position: fixed;
+    inset: 0;
+    background: #ffffff;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 999;
+    transition: opacity 0.4s ease-out;
+}
+
+#shutter-flash.flash-active {
+    opacity: 0.95;
+    transition: none;
+}
+
+#shockwave-ring {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid var(--ice-cyan);
+    box-shadow: 0 0 35px var(--ice-glow);
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 2;
+}
+
+#shockwave-ring.wave-active {
+    animation: shockwaveAnim 0.75s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+}
+
+@keyframes shockwaveAnim {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(80); opacity: 0; }
+}
+
+/* --- CENÁRIO TIPOGRÁFICO DE FUNDO (TOKYO MINIMALIST COMPOSITION) --- */
+.crystallize-bg-layer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.bg-main-name {
+    position: absolute;
+    top: 48%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--font-heading);
+    font-size: clamp(3.5rem, 8.5vw, 9rem);
+    font-weight: 800;
+    letter-spacing: clamp(4px, 1.2vw, 16px);
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(165, 232, 255, 0.08);
+    white-space: nowrap;
+    text-shadow: 0 0 60px rgba(56, 189, 248, 0.05);
+}
+
+.bg-tagline {
+    position: absolute;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: clamp(0.75rem, 1.2vw, 0.95rem);
+    letter-spacing: 4px;
+    color: var(--ice-cyan);
+    opacity: 0.35;
+    white-space: nowrap;
+    text-transform: uppercase;
+}
+
+.bg-ambient-phrase {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    opacity: 0.45;
+    transition: opacity 0.3s;
+}
+
+.p-index {
+    font-family: var(--font-serif);
+    font-size: 0.7rem;
+    color: var(--ice-glow);
+    letter-spacing: 1.5px;
+}
+
+.p-text {
+    font-size: clamp(0.85rem, 1vw, 1.05rem);
+    font-weight: 600;
+    color: var(--white);
+    letter-spacing: 0.5px;
+}
+
+.p-meta {
+    font-size: 0.62rem;
+    letter-spacing: 2px;
+    color: var(--ice-cyan);
+    opacity: 0.6;
+}
+
+.p-top-left { top: 16%; left: 8%; }
+.p-bottom-left { bottom: 18%; left: 8%; }
+.p-top-right { top: 16%; right: 8%; text-align: right; }
+.p-bottom-right { bottom: 18%; right: 8%; text-align: right; }
+
+.bg-crosshair {
+    position: absolute;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: rgba(165, 232, 255, 0.25);
+}
+.ch-1 { top: 12%; left: 5%; }
+.ch-2 { top: 12%; right: 5%; }
+.ch-3 { bottom: 12%; left: 5%; }
+.ch-4 { bottom: 12%; right: 5%; }
+
+/* --- HUD SUPERIOR (MINIMALIST TOKYO HEADER) --- */
+.hud-top {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    padding: 1.8rem 2.8rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.hud-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    pointer-events: auto;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    color: var(--ice-cyan);
+}
+
+.brand-title {
+    font-weight: 700;
+    color: var(--white);
+}
+
+.brand-divider {
+    opacity: 0.3;
+}
+
+.brand-age {
+    color: var(--ice-glow);
+    font-weight: 600;
+}
+
+.brand-role {
+    opacity: 0.6;
+}
+
+.hud-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    pointer-events: auto;
+}
+
+.state-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.9rem;
+    background: var(--hud-glass);
+    border: 1px solid var(--hud-border);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    font-size: 0.68rem;
+    letter-spacing: 2px;
+    font-weight: 600;
+}
+
+.state-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--ice-glow);
+    box-shadow: 0 0 8px var(--ice-glow);
+    animation: dotBlink 2s infinite;
+}
+
+@keyframes dotBlink {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+}
+
+.state-pill.frozen .state-dot {
+    background: #ffffff;
+    box-shadow: 0 0 10px #ffffff;
+    animation: none;
+}
+
+.state-pill.shattered .state-dot {
+    background: #ef4444;
+    box-shadow: 0 0 10px #ef4444;
+}
+
+.hud-btn {
+    background: var(--hud-glass);
+    border: 1px solid var(--hud-border);
+    backdrop-filter: blur(12px);
+    padding: 0.45rem 1.1rem;
+    border-radius: 20px;
+    color: var(--ice-light);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hud-btn:hover {
+    border-color: var(--hud-border-hover);
+    color: var(--white);
+    background: rgba(56, 189, 248, 0.18);
+    box-shadow: var(--frost-shadow);
+}
+
+.hud-btn.active {
+    border-color: var(--ice-glow);
+    background: rgba(56, 189, 248, 0.25);
+    color: var(--white);
+}
+
+/* --- HUD INFERIOR (CONTROLES ORIGINAIS DO CRYSTALLIZE) --- */
+.hud-bottom {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    padding: 2rem 2.8rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.controls-hint {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    pointer-events: auto;
+}
+
+.key-combo {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.key-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: var(--hud-glass);
+    border: 1px solid var(--hud-border);
+    border-radius: 4px;
+    font-size: 0.75rem;
+    color: var(--ice-cyan);
+}
+
+.hint-text {
+    font-size: 0.68rem;
+    letter-spacing: 2px;
+    color: var(--ice-cyan);
+    opacity: 0.7;
+    font-weight: 500;
+}
+
+/* Barra Central de Controles */
+.crystal-control-bar {
+    display: flex;
+    gap: 0.75rem;
+    background: rgba(10, 25, 47, 0.75);
+    border: 1px solid var(--hud-border);
+    backdrop-filter: blur(16px);
+    padding: 0.5rem 0.8rem;
+    border-radius: 35px;
+    pointer-events: auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.crystal-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    padding: 0.55rem 1.15rem;
+    border-radius: 25px;
+    color: var(--ice-light);
+    font-family: var(--font-mono);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-icon-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ice-cyan);
+}
+
+.btn-label-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.btn-name {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+
+.btn-kbd {
+    display: inline-block;
+    padding: 0.15rem 0.35rem;
+    background: rgba(165, 232, 255, 0.12);
+    border: 1px solid rgba(165, 232, 255, 0.25);
+    border-radius: 3px;
+    font-size: 0.58rem;
+    color: var(--ice-cyan);
+    letter-spacing: 0.5px;
+    font-family: var(--font-mono);
+}
+
+.crystal-btn:hover {
+    background: rgba(56, 189, 248, 0.2);
+    border-color: var(--hud-border-hover);
+    color: var(--white);
+    box-shadow: var(--frost-shadow);
+}
+
+.crystal-btn:active {
+    transform: scale(0.96);
+}
+
+.btn-shatter:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: #ef4444;
+    color: #ffffff;
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+}
+.btn-shatter:hover .btn-icon-wrap {
+    color: #ef4444;
+}
+
+.btn-freeze.active {
+    background: rgba(165, 232, 255, 0.25);
+    border-color: var(--white);
+    color: var(--white);
+}
+
+.telemetry-info {
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+    gap: 0.2rem;
+    pointer-events: auto;
+    font-size: 0.65rem;
+    letter-spacing: 1.5px;
+    color: var(--ice-cyan);
+    opacity: 0.65;
+}
+
+.telemetry-info strong {
+    color: var(--white);
+}
+
+/* --- FLYOUT DRAWERS (PROJETOS & CONTATO MINIMALISTAS) --- */
+.flyout-drawer {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: flex-end;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+
+.flyout-drawer.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.drawer-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 25, 47, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.drawer-panel {
+    position: relative;
+    width: min(520px, 92vw);
+    height: 100%;
+    background: linear-gradient(165deg, rgba(18, 59, 101, 0.5) 0%, rgba(10, 25, 47, 0.95) 100%);
+    border-left: 1px solid var(--hud-border);
+    padding: 3rem 2.5rem;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 2;
+    overflow-y: auto;
+}
+
+.flyout-drawer.open .drawer-panel {
+    transform: translateX(0);
+}
+
+.drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2.5rem;
+    border-bottom: 1px solid var(--hud-border);
+    padding-bottom: 1.5rem;
+}
+
+.drawer-kicker {
+    font-size: 0.68rem;
+    letter-spacing: 2px;
+    color: var(--ice-glow);
+    display: block;
+    margin-bottom: 0.3rem;
+}
+
+.drawer-title {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: var(--white);
+}
+
+.drawer-close-btn {
+    background: transparent;
+    border: 1px solid var(--hud-border);
+    color: var(--ice-cyan);
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s;
+}
+
+.drawer-close-btn:hover {
+    border-color: var(--ice-glow);
+    color: var(--white);
+    background: rgba(56, 189, 248, 0.2);
+}
+
+.drawer-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* Itens de Projeto no Drawer */
+.project-entry {
+    background: rgba(10, 25, 47, 0.5);
+    border: 1px solid var(--hud-border);
+    border-radius: 12px;
+    padding: 1.75rem;
+    transition: all 0.3s;
+}
+
+.project-entry:hover {
+    border-color: var(--hud-border-hover);
+    background: rgba(18, 59, 101, 0.4);
+    box-shadow: var(--frost-shadow);
+    transform: translateY(-2px);
+}
+
+.project-entry-top {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.entry-index {
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ice-glow);
+}
+
+.entry-title {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: 1px;
+}
+
+.entry-desc {
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: var(--ice-light);
+    opacity: 0.85;
+    margin-bottom: 1.5rem;
+}
+
+.entry-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.7rem 1.4rem;
+    background: rgba(56, 189, 248, 0.15);
+    border: 1px solid var(--hud-border);
+    border-radius: 6px;
+    color: var(--white);
+    text-decoration: none;
+    font-size: 0.75rem;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+    transition: all 0.25s;
+}
+
+.entry-btn:hover {
+    background: var(--ice-glow);
+    color: #050d1a;
+    box-shadow: 0 0 15px var(--ice-glow);
+}
+
+/* Itens de Contato no Drawer */
+.contact-entry {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    background: rgba(10, 25, 47, 0.5);
+    border: 1px solid var(--hud-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s;
+}
+
+.contact-entry:hover {
+    border-color: var(--hud-border-hover);
+    background: rgba(18, 59, 101, 0.4);
+    box-shadow: var(--frost-shadow);
+}
+
+.contact-entry-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: rgba(56, 189, 248, 0.15);
+    border: 1px solid var(--hud-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ice-cyan);
+}
+
+.contact-entry-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.c-type {
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    color: var(--ice-cyan);
+    opacity: 0.6;
+    margin-bottom: 0.2rem;
+}
+
+.c-val {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--white);
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    transition: color 0.2s;
+}
+
+.c-val:hover {
+    color: var(--ice-glow);
+}
+
+/* Toast Notification */
+.toast-notification {
+    position: fixed;
+    top: 5rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: rgba(10, 25, 47, 0.9);
+    border: 1px solid var(--ice-glow);
+    box-shadow: var(--frost-shadow);
+    padding: 0.65rem 1.6rem;
+    border-radius: 30px;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    color: var(--white);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 200;
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.toast-notification.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* --- RESPONSIVIDADE (MOBILE & TABLETS) --- */
+@media (max-width: 900px) {
+    .hud-top {
+        padding: 1.2rem 1.5rem;
+    }
+
+    .brand-role, .brand-divider:last-of-type {
+        display: none;
+    }
+
+    .hud-bottom {
+        padding: 1.2rem 1.5rem;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .controls-hint, .telemetry-info {
+        display: none;
+    }
+
+    .crystal-control-bar {
+        width: 100%;
+        justify-content: space-around;
+        padding: 0.4rem 0.5rem;
+    }
+
+    .crystal-btn {
+        padding: 0.45rem 0.75rem;
+    }
+
+    .btn-kbd {
+        display: none; /* Em mobile, exibe apenas os ícones e nomes */
+    }
+
+    .p-top-left, .p-top-right {
+        display: none; /* Simplifica densidade de texto no mobile */
+    }
+
+    .p-bottom-left { bottom: 12%; left: 5%; }
+    .p-bottom-right { bottom: 12%; right: 5%; }
+}
+
+@media (max-width: 500px) {
+    .hud-brand {
+        font-size: 0.68rem;
+    }
+
+    .hud-actions {
+        gap: 0.5rem;
+    }
+
+    .hud-btn span, #audioText {
+        display: none; /* No mobile estreito, preserva espaço */
+    }
+
+    .state-pill {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.6rem;
+    }
+
+    .crystal-btn .btn-name {
+        font-size: 0.65rem;
+    }
+}
